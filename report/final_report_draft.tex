@@ -65,7 +65,8 @@ Figure~\ref{fig:attention-maps}.
     \centering
     \includegraphics[width=0.82\linewidth]{figures/fig_paper_reported_accuracy.png}
     \caption{
-    Original paper's reported ViT-Tiny accuracy comparison across datasets.
+    Original paper's reported ViT-Tiny accuracy comparison across datasets
+    (adapted from Zheng et al., 2025).
     This is the quantitative trend we use as the target for reproduction:
     Default, Mimetic, and Structured/Impulse initialization are compared under
     the same model family.
@@ -80,9 +81,18 @@ heads, image size $32\times32$, and patch size 4.  We evaluated CIFAR-10 and
 CIFAR-100 with full training data, plus 10\% and 25\% training-subset settings
 to test the small-data regime.  The compared methods were default truncated
 normal initialization, Mimetic initialization, and Structured impulse
-initialization.  We report best top-1 validation accuracy, training curves, a
-CIFAR-10 seed-stability study over seeds 0, 1, and 2, and trained attention-map
-visualizations.
+initialization.
+
+We used the official training recipe with AdamW, learning rate $2\times10^{-3}$,
+weight decay 0.05, cosine scheduling, 10 warmup epochs, RandAugment, Mixup,
+CutMix, label smoothing, random erasing, and stochastic depth.  Full-data runs
+used batch size 1024 for 300 epochs on CIFAR-10 and 250 epochs on CIFAR-100;
+low-data runs used batch size 512 for 150 epochs on a Colab A100.  Mimetic
+initializes attention projections toward pretrained-like products
+($QK\!\approx\!I$, $VO\!\approx\!-I$), while Structured optimizes Q/K from
+positional embeddings so initial attention approximates sparse local impulse
+filters.  We report best top-1 accuracy, training curves, seed stability, and
+trained patch-to-patch attention maps.
 
 \input{part4_results_analysis}
 
@@ -106,11 +116,19 @@ more seeds to separate method-level gains from run-to-run variance.
 \section{References}
 \small
 \begin{enumerate}[itemsep=0pt,topsep=0pt,parsep=0pt]
-    \item Asher Trockman and J. Zico Kolter. \textit{Mimetic Initialization of
+    \item A. Trockman and J. Z. Kolter. \textit{Mimetic Initialization of
     Self-Attention Layers}. ICML, 2023.
-    \item Jianqiao Zheng et al. \textit{Structured Initialization for Vision
+    \item J. Zheng et al. \textit{Structured Initialization for Vision
     Transformers}. NeurIPS, 2025.
-    \item Ross Wightman. \textit{PyTorch Image Models / timm}. 2019.
+    \item A. Krizhevsky. \textit{Learning Multiple Layers of Features from Tiny
+    Images}. Technical report, 2009. CIFAR-10/CIFAR-100.
+    \item A. Paszke et al. \textit{PyTorch: An Imperative Style,
+    High-Performance Deep Learning Library}. NeurIPS, 2019.
+    \item R. Wightman. \textit{PyTorch Image Models / timm}. GitHub repository,
+    2019.
+    \item C. R. Harris et al. \textit{Array Programming with NumPy}. Nature,
+    2020; J. D. Hunter. \textit{Matplotlib}. Computing in Science \&
+    Engineering, 2007.
 \end{enumerate}
 \normalsize
 

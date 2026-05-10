@@ -25,3 +25,4 @@ wandb/
 *.out
 *.toc
 *.synctex.gz
+report/final_report_draft.pdf
