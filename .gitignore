@@ -1,0 +1,27 @@
+__pycache__/
+*.py[cod]
+.DS_Store
+.ipynb_checkpoints/
+
+# Large generated datasets and checkpoints are intentionally not committed.
+data/raw/
+data/*_imagefolder/
+*.pth
+*.pt
+*.ckpt
+checkpoint*.pth.tar
+model_best.pth.tar
+recovery*.pth.tar
+
+# Local experiment outputs that can be regenerated or are too large.
+official_structured_results/
+official_structured_data/
+runs/
+wandb/
+
+# LaTeX build files.
+*.aux
+*.log
+*.out
+*.toc
+*.synctex.gz

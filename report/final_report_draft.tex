@@ -1,0 +1,137 @@
+\documentclass[11pt]{article}
+
+\usepackage[top=0.45in,bottom=0.65in,left=0.7in,right=0.7in]{geometry}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{caption}
+\usepackage{enumitem}
+\usepackage{float}
+\usepackage{titlesec}
+
+\captionsetup{font=small,skip=3pt}
+\setlength{\parindent}{1em}
+\setlength{\parskip}{0.08em}
+\setlist{nosep,leftmargin=*}
+\titlespacing*{\section}{0pt}{0.55em}{0.25em}
+
+\makeatletter
+\renewcommand{\maketitle}{
+    \begin{center}
+    \vspace*{-2.4em}
+    {\Large\bfseries \@title \par}
+    \vspace{0.15em}
+    {\normalsize \@author \par}
+    \vspace{-0.35em}
+    \end{center}
+}
+\makeatother
+
+\title{From Mimetic to Structured Initialization:\\[-0.15em] Reproducing Attention Biases for Small-Data Vision Transformers}
+\author{Lu Shen (ls2244), Xuanbo Jia (xj256), Yichen Li (yl3938)}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Introduction}
+Vision Transformers (ViTs) can perform very well at scale, but they are often
+less data-efficient than convolutional neural networks when trained from scratch
+on small image datasets.  CNNs contain locality and translation bias by design,
+while vanilla ViTs must learn spatial structure through attention.  This project
+studies whether useful spatial bias can be injected only through initialization,
+without changing the ViT architecture.
+
+We reproduce and connect two related ideas.  Mimetic initialization observes
+that pretrained transformers contain structured attention-weight statistics,
+especially diagonal patterns, and initializes a new model to mimic those
+statistics.  Structured initialization goes further by directly programming the
+initial attention maps to resemble local convolutional impulse filters.  Our
+goal is to test whether these initialization methods improve CIFAR-10 and
+CIFAR-100 performance in full-data and low-data settings.
+
+\section{Chosen Result}
+The chosen result is the accuracy and attention-structure comparison among
+three ViT initializations: Default, Mimetic, and Structured.  This combines the
+main claims of the two papers: Mimetic should improve training by copying
+pretrained-like self-attention statistics, while Structured should improve
+small-data learning by explicitly imposing local attention at initialization.
+We therefore reproduce both quantitative accuracy trends and qualitative
+attention-map structure.  The quantitative result is summarized later in
+Figure~\ref{fig:combined-accuracy}, and the attention-map component is shown in
+Figure~\ref{fig:attention-maps}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.82\linewidth]{figures/fig_paper_reported_accuracy.png}
+    \caption{
+    Original paper's reported ViT-Tiny accuracy comparison across datasets.
+    This is the quantitative trend we use as the target for reproduction:
+    Default, Mimetic, and Structured/Impulse initialization are compared under
+    the same model family.
+    }
+    \label{fig:paper-reported-accuracy}
+\end{figure}
+
+\section{Methodology}
+We reimplemented the experiment in PyTorch using a ViT-Tiny style model from
+\texttt{timm}: 12 transformer layers, embedding dimension 192, 3 attention
+heads, image size $32\times32$, and patch size 4.  We evaluated CIFAR-10 and
+CIFAR-100 with full training data, plus 10\% and 25\% training-subset settings
+to test the small-data regime.  The compared methods were default truncated
+normal initialization, Mimetic initialization, and Structured impulse
+initialization.  We report best top-1 validation accuracy, training curves, a
+CIFAR-10 seed-stability study over seeds 0, 1, and 2, and trained attention-map
+visualizations.
+
+\input{part4_results_analysis}
+
+\section{Reflections}
+This project was successful in reproducing the main qualitative conclusion of
+the two papers: better attention initialization can improve small-data ViT
+training without modifying the architecture.  The clearest result is that
+Mimetic initialization is a reliable improvement over the default baseline, and
+Structured initialization usually provides the largest gain, especially in
+low-data settings.
+
+The main limitation is that our absolute accuracies are below the original
+reported results.  This is expected for a course-scale reproduction because we
+used a smaller compute budget, fewer seeds, and a simplified training sweep.
+The seed study also shows that Structured initialization is not uniformly stable:
+its stronger locality bias can improve data efficiency, but may also increase
+sensitivity to the exact run.  With more time, we would train for the full
+original schedule, sweep learning-rate and augmentation settings, and evaluate
+more seeds to separate method-level gains from run-to-run variance.
+
+\section{References}
+\small
+\begin{enumerate}[itemsep=0pt,topsep=0pt,parsep=0pt]
+    \item Asher Trockman and J. Zico Kolter. \textit{Mimetic Initialization of
+    Self-Attention Layers}. ICML, 2023.
+    \item Jianqiao Zheng et al. \textit{Structured Initialization for Vision
+    Transformers}. NeurIPS, 2025.
+    \item Ross Wightman. \textit{PyTorch Image Models / timm}. 2019.
+\end{enumerate}
+\normalsize
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.82\linewidth]{figures/fig_seed_stability_curve.pdf}
+    \caption{
+    CIFAR-10 seed stability under a common 250-epoch budget.  Lines show the
+    mean over seeds 0, 1, and 2; shaded bands show one standard deviation.
+    }
+    \label{fig:seed-stability}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{figures/fig_training_curves_grid.pdf}
+    \caption{
+    Training curves for the six evaluated settings.  Curves use the available
+    epoch-by-epoch CSV logs.
+    }
+    \label{fig:training-curves}
+\end{figure}
+
+\end{document}
