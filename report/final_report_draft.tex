@@ -132,24 +132,21 @@ more seeds to separate method-level gains from run-to-run variance.
 \end{enumerate}
 \normalsize
 
-\begin{figure}[H]
+\vspace{-0.25em}
+\begin{center}
+\begin{minipage}{0.34\linewidth}
     \centering
-    \includegraphics[width=0.82\linewidth]{figures/fig_seed_stability_curve.pdf}
-    \caption{
-    CIFAR-10 seed stability under a common 250-epoch budget.  Lines show the
-    mean over seeds 0, 1, and 2; shaded bands show one standard deviation.
-    }
+    \includegraphics[width=\linewidth]{figures/fig_seed_stability_curve.pdf}
+    \captionof{figure}{CIFAR-10 seed stability over seeds 0, 1, and 2.}
     \label{fig:seed-stability}
-\end{figure}
-
-\begin{figure}[H]
+\end{minipage}
+\hfill
+\begin{minipage}{0.62\linewidth}
     \centering
     \includegraphics[width=\linewidth]{figures/fig_training_curves_grid.pdf}
-    \caption{
-    Training curves for the six evaluated settings.  Curves use the available
-    epoch-by-epoch CSV logs.
-    }
+    \captionof{figure}{Training curves for the six evaluated settings.}
     \label{fig:training-curves}
-\end{figure}
+\end{minipage}
+\end{center}
 
 \end{document}
